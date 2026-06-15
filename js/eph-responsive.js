@@ -112,49 +112,50 @@
     applyTransform(clampY(startTranslate + delta));
   }
 
- function onTouchEnd() {
+function onTouchEnd() {
     if (!dragging) return;
     dragging = false;
 
     var collapsed = collapsedTranslate();
+    var panelMovedOrToggled = false; // Penanda apakah panel melakukan pergerakan
 
     if (!moved) {
       // Jika cuma disentuh (tap) di handle
       if (isHandleTap) {
         setExpanded(currentY > collapsed / 2);
+        panelMovedOrToggled = true; // Tandai bahwa panel bergerak (naik/turun) karena ditap
       }
     } else {
-      // --- LOGIKA BARU: DETEKSI SWIPE (TARIKAN PENDEK) ---
-      
-      // Menghitung berapa pixel jari Anda bergeser dari titik awal sentuhan
+      // --- LOGIKA DETEKSI SWIPE (TARIKAN PENDEK) ---
       var dragDistance = currentY - startTranslate; 
-      
-      // Anda bisa mengatur sensitivitas tarikan di sini (misal: 50 pixel)
       var SWIPE_THRESHOLD = 50; 
 
       if (dragDistance > SWIPE_THRESHOLD) {
-        // Jika ditarik ke BAWAH lebih dari 50px -> Langsung TUTUP panel
         setExpanded(false);
       } 
       else if (dragDistance < -SWIPE_THRESHOLD) {
-        // Jika ditarik ke ATAS lebih dari 50px -> Langsung BUKA panel
         setExpanded(true);
       } 
       else {
-        // Jika tarikannya sangat pelan/kecil (kurang dari 50px), 
-        // barulah kita kembali menggunakan aturan batas 50% layar
         setExpanded(currentY < collapsed / 2);
       }
+      panelMovedOrToggled = true; // Tandai bahwa panel ditarik
+    }
 
-      // Mencegah klik tidak sengaja pada link setelah menggeser
+    // --- PENCEGAH GHOST CLICK (KHUSUS SAFARI/iOS) ---
+    // Jika panel merespons (entah ditarik ATAU handle-nya diketuk)
+    if (panelMovedOrToggled) {
       preventNextClick = true;
+      
+      // Durasi dinaikkan menjadi 400ms untuk mengalahkan delay 300ms dari Safari
       setTimeout(function() {
         preventNextClick = false;
-      }, 100);
+      }, 400); 
     }
 
     panel.classList.remove('eph-dragging');
   }
+  
   function buildHandle() {
     handle = document.createElement('div');
     handle.id = 'panel-handle';
