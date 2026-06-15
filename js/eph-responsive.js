@@ -171,16 +171,28 @@ function onTouchEnd() {
     panel.insertBefore(handle, panel.firstChild);
   }
 
+// Tambahkan variabel ini di atas fungsi
+  var isPanelInitialized = false;
+
   function handleViewportChange() {
     if (!panel) return;
 
     if (isMobile()) {
       if (!document.getElementById('panel-handle')) buildHandle();
-      setExpanded(false, false);
+      
+      // KUNCI PENYELESAIAN: 
+      // Hanya paksa panel ke bawah (setExpanded) SAAT PERTAMA KALI DIMUAT.
+      // Jika layar berubah ukuran karena roda menu iOS muncul, panel akan diam saja.
+      if (!isPanelInitialized) {
+        setExpanded(false, false);
+        isPanelInitialized = true;
+      }
+
     } else {
       panel.style.transform = '';
       panel.classList.remove('eph-dragging');
       currentY = 0;
+      isPanelInitialized = false; // Reset memori jika pengguna kembali ke layar Desktop
     }
   }
 
@@ -215,19 +227,6 @@ function onTouchEnd() {
         if (isMobile()) setExpanded(true);
       });
     }
-// ========================================================
-var semuaDropdown = document.querySelectorAll('select');
-    semuaDropdown.forEach(function(dropdown) {
-      
-      // Menghentikan semua bentuk sentuhan & klik agar tidak bocor ke bawah
-      ['touchstart', 'touchmove', 'touchend', 'click'].forEach(function(namaEvent) {
-        dropdown.addEventListener(namaEvent, function(e) {
-          e.stopPropagation(); 
-        });
-      });
-
-    });
-// ========================================================
   });
 
   window.addEventListener('resize', handleViewportChange);
