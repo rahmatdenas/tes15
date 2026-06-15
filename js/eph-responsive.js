@@ -16,7 +16,8 @@
   var moved          = false;
   var startClientY   = 0;
   var startTranslate = 0;
-  var isHandleTap    = false; // Penanda baru untuk mendeteksi area ketukan
+  var isHandleTap    = false; 
+  var activeScrollNode = null; // Menyimpan elemen yang sedang discroll
 
   function isMobile() {
     return window.matchMedia(MOBILE_QUERY).matches;
@@ -50,22 +51,30 @@
     updateLabel(expand);
   }
 
-  function isExpanded() {
-    return currentY < collapsedTranslate() / 2;
+  // Helper untuk mendeteksi apakah elemen yang disentuh bisa digulir (punya scroll)
+  function getScrollableParent(node, root) {
+    while (node && node !== root && node !== document.body) {
+      if (node.scrollHeight > node.clientHeight) {
+        var overflowY = window.getComputedStyle(node).overflowY;
+        if (overflowY === 'auto' || overflowY === 'scroll') {
+          return node;
+        }
+      }
+      node = node.parentNode;
+    }
+    return null;
   }
 
-  function getClientY(e) {
-    if (e.touches && e.touches.length) return e.touches[0].clientY;
-    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY;
-    return e.clientY;
-  }
-
-  function onPointerDown(e) {
+  function onTouchStart(e) {
     if (!isMobile()) return;
+    
+    // Gunakan touches untuk perangkat mobile
+    var touch = e.touches ? e.touches[0] : e;
+    
+    // Pastikan kita mendapatkan elemen HTML (bukan text node)
+    var target = e.target.nodeType === 3 ? e.target.parentNode : e.target;
 
-    var target = e.target;
-
-    // Abaikan interaksi pada tombol, tautan, atau input
+    // Abaikan interaksi pada elemen input/tombol
     var interactiveTags = ['BUTTON', 'A', 'SELECT', 'OPTION', 'INPUT'];
     if (interactiveTags.indexOf(target.tagName) !== -1 || target.closest('button, a, select')) {
       return;
@@ -73,69 +82,57 @@
 
     dragging = true;
     moved = false;
-    startClientY = getClientY(e);
+    startClientY = touch.clientY;
     startTranslate = currentY;
-
-    // Deteksi apakah yang disentuh adalah area HANDLE (untuk izin tap)
+    
+    // Cek apakah sentuhan pertama berada di handle
     isHandleTap = !!target.closest('#panel-handle');
-
-    // Tandai jika area yang diklik adalah area yang bisa di-scroll (overflow)
-    panel._dragScrollContainer = target.closest('.panel-content, #index-list, nav');
+    
+    // Deteksi otomatis apakah target yang disentuh ada di dalam area yang bisa discroll
+    activeScrollNode = getScrollableParent(target, panel);
 
     panel.classList.add('eph-dragging');
-
-    document.addEventListener('pointermove', onPointerMove, { passive: false });
-    document.addEventListener('pointerup', onPointerUp);
-    document.addEventListener('pointercancel', onPointerUp);
   }
 
-  function onPointerMove(e) {
+  function onTouchMove(e) {
     if (!dragging) return;
+    
+    var touch = e.touches ? e.touches[0] : e;
+    var delta = touch.clientY - startClientY;
 
-    var clientY = getClientY(e);
-    var delta = clientY - startClientY;
-
-    // Logika Scroll vs Drag
-    if (panel._dragScrollContainer) {
-      var sc = panel._dragScrollContainer;
-      
-      // Jika scroll ke atas atau sedang tidak di puncak, batalkan drag panel
-      if (delta < 0 || (delta > 0 && sc.scrollTop > 0)) {
+    // Logika Pintar: Scroll vs Drag
+    if (activeScrollNode) {
+      // Jika pengguna sedang scroll isi daftar ke bawah, ATAU
+      // scroll daftar ke atas tapi posisinya belum mentok di paling atas
+      if (delta < 0 || (delta > 0 && activeScrollNode.scrollTop > 0)) {
         dragging = false;
         panel.classList.remove('eph-dragging');
-        document.removeEventListener('pointermove', onPointerMove);
-        document.removeEventListener('pointerup', onPointerUp);
-        document.removeEventListener('pointercancel', onPointerUp);
-        return;
+        return; // Biarkan browser melakukan scroll bawaan
       }
     }
 
     if (Math.abs(delta) > DRAG_THRESHOLD) {
       moved = true;
+      // PENTING: Matikan efek 'pull-to-refresh' / scroll bawaan browser saat sedang menarik panel
       if (e.cancelable) e.preventDefault(); 
     }
 
     applyTransform(clampY(startTranslate + delta));
   }
 
-  function onPointerUp() {
+  function onTouchEnd() {
     if (!dragging) return;
     dragging = false;
-    document.removeEventListener('pointermove', onPointerMove);
-    document.removeEventListener('pointerup', onPointerUp);
-    document.removeEventListener('pointercancel', onPointerUp);
 
     var collapsed = collapsedTranslate();
 
     if (!moved) {
-      // PERBAIKAN: Jika TIDAK DIGESER (hanya disentuh/tap)
-      // Panel HANYA akan bereaksi jika yang ditap adalah area handle.
-      // Jika yang ditap area lain (header, dll), abaikan saja.
+      // Kalau cuma ditap (tidak ditarik), hanya handle yang boleh bereaksi
       if (isHandleTap) {
         setExpanded(currentY > collapsed / 2);
       }
     } else {
-      // Jika ditarik/digeser, cek posisi terakhir untuk membuka/menutup
+      // Kalau panel benar-benar ditarik, tutup/buka berdasarkan posisi terakhir
       setExpanded(currentY < collapsed / 2);
     }
 
@@ -176,8 +173,11 @@
 
     handleViewportChange();
 
-    // Event listener diletakkan pada keseluruhan panel
-    panel.addEventListener('pointerdown', onPointerDown);
+    // MENGGUNAKAN TOUCH EVENTS MURNI DENGAN PASSIVE FALSE
+    panel.addEventListener('touchstart', onTouchStart, { passive: false });
+    panel.addEventListener('touchmove', onTouchMove, { passive: false });
+    panel.addEventListener('touchend', onTouchEnd);
+    panel.addEventListener('touchcancel', onTouchEnd);
 
     if (window.Map) {
       Map.on('popupopen', function() {
