@@ -198,6 +198,12 @@ function onTouchEnd() {
     // Mencegah klik pada tautan <a> jika pengguna baru saja menggeser/menarik (drag)
     window.addEventListener('click', function(e) {
       if (preventNextClick) {
+        // Pengecualian: Bebaskan dropdown, input, dan tombol!
+        // Jika yang diklik adalah form, izinkan kliknya tembus seketika.
+        if (e.target.closest('select, input, textarea, button, label')) {
+          return; 
+        }
+        // Sekian
         e.preventDefault();
         e.stopPropagation();
       }
