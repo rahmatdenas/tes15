@@ -73,9 +73,10 @@
 
     // PENTING: 'A' (tautan) dihapus dari daftar pengecualian ini!
     // Hanya Input, Tombol, dan Dropdown yang memblokir tarikan panel
-   if (target.closest('select, input, textarea, button, label')) {
-  return; 
-}
+if (target.closest('select, input, textarea, button, label')) {
+      e.stopPropagation(); // Dinding beton: hentikan rambatan sentuhan ke peta/panel!
+      return; 
+    }
 
     dragging = true;
     moved = false;
@@ -214,8 +215,17 @@ function onTouchEnd() {
         if (isMobile()) setExpanded(true);
       });
     }
+var semuaDropdown = document.querySelectorAll('select');
+    semuaDropdown.forEach(function(dropdown) {
+      dropdown.addEventListener('change', function() {
+        this.blur(); 
+      });
+    });
+    
   });
 
   window.addEventListener('resize', handleViewportChange);
 
 })();
+
+
