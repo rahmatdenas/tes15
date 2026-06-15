@@ -94,10 +94,12 @@ nav li a {
 }
 
 nav li.selected a,
-nav li.selected a:hover {
-  background: transparent;
+nav li a.selected,
+nav li.active a,
+nav li a.active {
+  background: transparent; 
+  color: #fff !important;             
 }
-
 #loading {
   display: flex;
   justify-content: center;
