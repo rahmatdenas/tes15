@@ -32,9 +32,17 @@
     return Math.min(Math.max(y, 0), collapsedTranslate());
   }
 
-  function applyTransform(y) {
+function applyTransform(y) {
     currentY = y;
-    panel.style.transform = 'translateY(' + y + 'px)';
+    
+    // KUNCI PENYELAMAT iOS: 
+    // Jika panel terbuka penuh (y = 0), matikan properti 'transform' sepenuhnya.
+    // Ini akan menipu Safari agar tidak panik saat membuka dropdown.
+    if (y === 0) {
+      panel.style.transform = 'none';
+    } else {
+      panel.style.transform = 'translateY(' + y + 'px)';
+    }
   }
 
   function updateLabel(expanded) {
