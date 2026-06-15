@@ -11,12 +11,29 @@
   color: #a65959;
 }
 
-nav li a {
-  background: #a65959;
-  color: #600;
+/* 1. Atur container ul agar Index di kiri dan About di kanan */
+nav ul {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px; /* Sesuaikan angka 20px dengan jarak pinggir layout Anda */
+  margin: 0;
+  list-style: none;
 }
+
+/* 2. Ganti nav li a lama dengan ini (teks pudar, tanpa background) */
+nav li a {
+  display: inline-block;
+  padding: 10px 0;
+  background: transparent; 
+  color: #eaa; /* Merah pudar untuk menu yang belum dipilih */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* 3. Ganti nav li a:hover lama dengan ini (teks putih saat disentuh kursor) */
 nav li a:hover {
-  background: #c49090;
+  background: transparent; 
+  color: #fff; 
 }
 
 #index header {
