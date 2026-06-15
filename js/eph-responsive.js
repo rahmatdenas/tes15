@@ -8,7 +8,7 @@
 
   var MOBILE_QUERY   = '(max-width: 800px)';
   var HANDLE_HEIGHT  = 56;   // harus sama dengan tinggi #panel-handle di CSS
-  var DRAG_THRESHOLD = 5;    // px, untuk membedakan tap vs drag
+  var DRAG_THRESHOLD = 5;    // px, toleransi gerakan untuk membedakan tap vs drag
 
   var panel, handle, handleLabel;
   var currentY       = 0;       
@@ -17,7 +17,8 @@
   var startClientY   = 0;
   var startTranslate = 0;
   var isHandleTap    = false; 
-  var activeScrollNode = null; // Menyimpan elemen yang sedang discroll
+  var activeScrollNode = null; 
+  var preventNextClick = false; // Penanda untuk membatalkan klik link jika digeser
 
   function isMobile() {
     return window.matchMedia(MOBILE_QUERY).matches;
@@ -51,7 +52,6 @@
     updateLabel(expand);
   }
 
-  // Helper untuk mendeteksi apakah elemen yang disentuh bisa digulir (punya scroll)
   function getScrollableParent(node, root) {
     while (node && node !== root && node !== document.body) {
       if (node.scrollHeight > node.clientHeight) {
@@ -68,15 +68,13 @@
   function onTouchStart(e) {
     if (!isMobile()) return;
     
-    // Gunakan touches untuk perangkat mobile
     var touch = e.touches ? e.touches[0] : e;
-    
-    // Pastikan kita mendapatkan elemen HTML (bukan text node)
     var target = e.target.nodeType === 3 ? e.target.parentNode : e.target;
 
-    // Abaikan interaksi pada elemen input/tombol
-    var interactiveTags = ['BUTTON', 'A', 'SELECT', 'OPTION', 'INPUT'];
-    if (interactiveTags.indexOf(target.tagName) !== -1 || target.closest('button, a, select')) {
+    // PENTING: 'A' (tautan) dihapus dari daftar pengecualian ini!
+    // Hanya Input, Tombol, dan Dropdown yang memblokir tarikan panel
+    var interactiveTags = ['BUTTON', 'SELECT', 'OPTION', 'INPUT'];
+    if (interactiveTags.indexOf(target.tagName) !== -1 || target.closest('button, select, input')) {
       return;
     }
 
@@ -85,10 +83,7 @@
     startClientY = touch.clientY;
     startTranslate = currentY;
     
-    // Cek apakah sentuhan pertama berada di handle
     isHandleTap = !!target.closest('#panel-handle');
-    
-    // Deteksi otomatis apakah target yang disentuh ada di dalam area yang bisa discroll
     activeScrollNode = getScrollableParent(target, panel);
 
     panel.classList.add('eph-dragging');
@@ -100,21 +95,18 @@
     var touch = e.touches ? e.touches[0] : e;
     var delta = touch.clientY - startClientY;
 
-    // Logika Pintar: Scroll vs Drag
+    // Logika Pintar: Scroll vs Drag (Daftar Index)
     if (activeScrollNode) {
-      // Jika pengguna sedang scroll isi daftar ke bawah, ATAU
-      // scroll daftar ke atas tapi posisinya belum mentok di paling atas
       if (delta < 0 || (delta > 0 && activeScrollNode.scrollTop > 0)) {
         dragging = false;
         panel.classList.remove('eph-dragging');
-        return; // Biarkan browser melakukan scroll bawaan
+        return; // Biarkan browser melakukan scroll daftar (native scroll)
       }
     }
 
     if (Math.abs(delta) > DRAG_THRESHOLD) {
       moved = true;
-      // PENTING: Matikan efek 'pull-to-refresh' / scroll bawaan browser saat sedang menarik panel
-      if (e.cancelable) e.preventDefault(); 
+      if (e.cancelable) e.preventDefault(); // Matikan pull-to-refresh
     }
 
     applyTransform(clampY(startTranslate + delta));
@@ -127,13 +119,17 @@
     var collapsed = collapsedTranslate();
 
     if (!moved) {
-      // Kalau cuma ditap (tidak ditarik), hanya handle yang boleh bereaksi
       if (isHandleTap) {
         setExpanded(currentY > collapsed / 2);
       }
     } else {
-      // Kalau panel benar-benar ditarik, tutup/buka berdasarkan posisi terakhir
       setExpanded(currentY < collapsed / 2);
+      
+      // Jika pengguna menggeser (bukan tap biasa), batalkan klik pada link
+      preventNextClick = true;
+      setTimeout(function() {
+        preventNextClick = false;
+      }, 100);
     }
 
     panel.classList.remove('eph-dragging');
@@ -173,11 +169,25 @@
 
     handleViewportChange();
 
-    // MENGGUNAKAN TOUCH EVENTS MURNI DENGAN PASSIVE FALSE
     panel.addEventListener('touchstart', onTouchStart, { passive: false });
     panel.addEventListener('touchmove', onTouchMove, { passive: false });
     panel.addEventListener('touchend', onTouchEnd);
     panel.addEventListener('touchcancel', onTouchEnd);
+
+    // Mencegah klik pada tautan <a> jika pengguna baru saja menggeser/menarik (drag)
+    panel.addEventListener('click', function(e) {
+      if (preventNextClick) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true); // 'true' (useCapture) agar event dibajak sebelum sampai ke elemen <a>
+
+    // Mencegah browser mobile memicu drag-and-drop bawaan pada gambar
+    panel.addEventListener('dragstart', function(e) {
+      if (e.target.tagName === 'IMG') {
+        e.preventDefault();
+      }
+    });
 
     if (window.Map) {
       Map.on('popupopen', function() {
