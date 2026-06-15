@@ -313,19 +313,7 @@ function generateFilterSelect() {
   let selectRegion = document.getElementById('filter-region');
   let selectSort = document.getElementById('sort-order');
 
-// ========================================================
-  // TAMENG ANTI-BOCOR BAWAAN LEAFLET
-  // Mencegah Leaflet "mencuri" fokus saat dropdown diketuk
-  // ========================================================
-  if (window.L && L.DomEvent) {
-    L.DomEvent.disableClickPropagation(selectRegion);
-    L.DomEvent.disableClickPropagation(selectSort);
-    L.DomEvent.disableScrollPropagation(selectRegion);
-    L.DomEvent.disableScrollPropagation(selectSort);
-  }
-  // ========================================================
-
-  
+ 
   // 1. Bangun Master Dropdown (Wilayah)
   selectRegion.innerHTML = `<option value="all">Semua Wilayah – ${DesignationIndex.all.total}</option>`;
   
