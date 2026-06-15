@@ -80,8 +80,8 @@ nav li {
 nav li a {
   display: block;
   position: relative;
-  margin: 0 12px 0 0;
-  padding: 6px 12px 6px 16px;
+  margin: 0 2px 0 0;
+  padding: 6px 12px 6px 12px;
   font-size: 12px;
   line-height: 12px;
   font-family: "Open Sans", sans-serif;
@@ -91,19 +91,6 @@ nav li a {
   text-transform: uppercase;
   transition-property: background;
   transition-duration: 0.3s;
-}
-
-nav li a::after {
-  content: '';
-  display: inline-block;
-  position: absolute;
-  top: 0; right: -8px;
-  width: 15px;
-  height: 24px;
-  border-radius: 0 6px 0 0;
-  background: inherit;
-  transform: skew(30deg);
-  border-bottom: 1px solid #FFF;
 }
 
 nav li.selected a,
