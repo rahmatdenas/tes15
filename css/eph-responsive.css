@@ -113,6 +113,9 @@
 
   .filter-box select {
     font-size: 13px;
+       touch-action: manipulation;
+     -webkit-user-select: auto !important;
+  user-select: auto !important;
   }
 
   #filter-features {
