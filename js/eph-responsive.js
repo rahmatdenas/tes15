@@ -11,11 +11,12 @@
   var DRAG_THRESHOLD = 5;    // px, untuk membedakan tap vs drag
 
   var panel, handle, handleLabel;
-  var currentY    = 0;       
-  var dragging    = false;
-  var moved       = false;
-  var startClientY  = 0;
+  var currentY       = 0;       
+  var dragging       = false;
+  var moved          = false;
+  var startClientY   = 0;
   var startTranslate = 0;
+  var isHandleTap    = false; // Penanda baru untuk mendeteksi area ketukan
 
   function isMobile() {
     return window.matchMedia(MOBILE_QUERY).matches;
@@ -64,7 +65,7 @@
 
     var target = e.target;
 
-    // 1. Abaikan klik pada elemen interaktif agar tombol/dropdown tetap berfungsi
+    // Abaikan interaksi pada tombol, tautan, atau input
     var interactiveTags = ['BUTTON', 'A', 'SELECT', 'OPTION', 'INPUT'];
     if (interactiveTags.indexOf(target.tagName) !== -1 || target.closest('button, a, select')) {
       return;
@@ -75,13 +76,14 @@
     startClientY = getClientY(e);
     startTranslate = currentY;
 
-    // 2. Tandai jika area yang diklik adalah area yang bisa di-scroll (overflow)
-    // Sesuaikan selector dengan class/id area scrollable Anda
+    // Deteksi apakah yang disentuh adalah area HANDLE (untuk izin tap)
+    isHandleTap = !!target.closest('#panel-handle');
+
+    // Tandai jika area yang diklik adalah area yang bisa di-scroll (overflow)
     panel._dragScrollContainer = target.closest('.panel-content, #index-list, nav');
 
     panel.classList.add('eph-dragging');
 
-    // Gunakan passive: false agar kita bisa mencegah scroll native jika diperlukan
     document.addEventListener('pointermove', onPointerMove, { passive: false });
     document.addEventListener('pointerup', onPointerUp);
     document.addEventListener('pointercancel', onPointerUp);
@@ -93,14 +95,12 @@
     var clientY = getClientY(e);
     var delta = clientY - startClientY;
 
-    // 3. Logika untuk mencegah bentrok antara "Scroll Konten" dan "Drag Panel"
+    // Logika Scroll vs Drag
     if (panel._dragScrollContainer) {
       var sc = panel._dragScrollContainer;
       
-      // Jika pengguna menggeser ke ATAS (baca konten bawah) 
-      // ATAU menggeser ke BAWAH tapi posisi scroll belum mentok di paling atas:
+      // Jika scroll ke atas atau sedang tidak di puncak, batalkan drag panel
       if (delta < 0 || (delta > 0 && sc.scrollTop > 0)) {
-        // Batalkan drag panel, biarkan browser melakukan scroll konten bawaan
         dragging = false;
         panel.classList.remove('eph-dragging');
         document.removeEventListener('pointermove', onPointerMove);
@@ -112,7 +112,6 @@
 
     if (Math.abs(delta) > DRAG_THRESHOLD) {
       moved = true;
-      // Cegah scroll halaman saat kita murni menarik panel ke bawah/atas
       if (e.cancelable) e.preventDefault(); 
     }
 
@@ -129,8 +128,14 @@
     var collapsed = collapsedTranslate();
 
     if (!moved) {
-      setExpanded(currentY > collapsed / 2);
+      // PERBAIKAN: Jika TIDAK DIGESER (hanya disentuh/tap)
+      // Panel HANYA akan bereaksi jika yang ditap adalah area handle.
+      // Jika yang ditap area lain (header, dll), abaikan saja.
+      if (isHandleTap) {
+        setExpanded(currentY > collapsed / 2);
+      }
     } else {
+      // Jika ditarik/digeser, cek posisi terakhir untuk membuka/menutup
       setExpanded(currentY < collapsed / 2);
     }
 
@@ -150,8 +155,6 @@
     handle.appendChild(grip);
     handle.appendChild(handleLabel);
     panel.insertBefore(handle, panel.firstChild);
-    
-    // HAPUS listener dari sini, dipindah ke seluruh #panel saat inisialisasi
   }
 
   function handleViewportChange() {
@@ -173,7 +176,7 @@
 
     handleViewportChange();
 
-    // 4. DAFTARKAN LISTENER KE SELURUH PANEL
+    // Event listener diletakkan pada keseluruhan panel
     panel.addEventListener('pointerdown', onPointerDown);
 
     if (window.Map) {
