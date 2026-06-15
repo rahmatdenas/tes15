@@ -104,11 +104,18 @@ optgroup option {
   background: #f3e9e9;
 }
 
-#index-list li:hover {
-  background: #eaa;
-  box-shadow: 0 -1px #eaa;
+/* --- TAMBAHAN BARU: Untuk safari --- */
+#index-list li,
+#index-list li a {
+  -webkit-tap-highlight-color: transparent;
 }
-
+@media (hover: hover) and (pointer: fine) {
+  #index-list li:hover {
+    background: #eaa;
+    box-shadow: 0 -1px #eaa;
+  }
+}
+/* AKHIR TAMBAHAN BARU */
 #index-list li a {
   border-bottom-color: #eaa;
 }
