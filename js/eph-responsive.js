@@ -196,7 +196,7 @@ function onTouchEnd() {
     panel.addEventListener('touchcancel', onTouchEnd);
 
     // Mencegah klik pada tautan <a> jika pengguna baru saja menggeser/menarik (drag)
-    panel.addEventListener('click', function(e) {
+    window.addEventListener('click', function(e) {
       if (preventNextClick) {
         e.preventDefault();
         e.stopPropagation();
