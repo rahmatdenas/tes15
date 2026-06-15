@@ -419,6 +419,6 @@ nav li a.active {
 }
 
 .leaflet-control-locate {
-  margin-bottom: 40px !important; /* Silakan ubah angka 40px ini sesuai selera Anda */
-  margin-right: 15px !important;  /* Opsional: memberi sedikit jarak dari tepi kanan layarnya juga */
+  margin-bottom: 50px !important; /* Silakan ubah angka 40px ini sesuai selera Anda */
+  margin-right: 10px !important;  /* Opsional: memberi sedikit jarak dari tepi kanan layarnya juga */
 }
