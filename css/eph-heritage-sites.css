@@ -108,6 +108,7 @@ optgroup option {
 #index-list li,
 #index-list li a {
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 @media (hover: hover) and (pointer: fine) {
   #index-list li:hover {
