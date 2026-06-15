@@ -59,6 +59,17 @@ function initMap() {
   };
   L.control.layers(baseMaps, null, {position: 'topleft'}).addTo(Map);
 
+ // Lokasi saya
+  L.control.locate({
+    position: 'bottomright', // Posisinya di bawah tombol zoom/layer
+    showCompass: false,
+    strings: {
+        title: "Tunjukkan lokasi saya"
+    }
+  }).addTo(Map); // Menggunakan huruf 'M' besar sesuai variabel Anda
+  // ========================================================
+
+  
   // Add powered by Wikidata map control
   let powered = L.control({ position: 'bottomleft' });
   powered.onAdd = function(Map) {
