@@ -175,13 +175,13 @@ border: 0px solid #FFF;
   display: block;
   background: #f3e9e9;      /* Warna latar belakang merah gelap */
   color: #000;        /* Warna teks saat Anda mengetik */
+  border-bottom: 1px solid #eaa;
 }
 
 /* 2. Mengubah warna teks PLACEHOLDER menjadi putih */
 #search-input::placeholder {
   color: #888888;
   opacity: 1; /* Sangat penting ditambahkan */
-  font-style: italic;
 }
 
 #details .wikipedia-link a img {
