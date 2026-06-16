@@ -657,13 +657,23 @@ function renderHistoricalImagesInPanel(qid) {
 
   let html = '';
   
-  // Mesin pembuat blok HTML: [Keterangan] -> [Foto]
+// Mesin pembuat blok HTML: Dibungkus div -> [Foto] -> [Keterangan]
   function buildImageBlock(imgObj) {
-    let block = '';
-    if (imgObj.caption) {
-      block += `<div class="article main-text"><p>${imgObj.caption}</p></div>`;
-    }
+    // 1. Buka bungkus div (overflow: hidden membantu membersihkan efek 'float' dari CSS bawaan)
+    let block = '<div class="arsip-block" style="margin-bottom: 30px; overflow: hidden;">';
+    
+    // 2. Cetak fotonya terlebih dahulu
     block += generateFigure(imgObj.file);
+    
+    // 3. Cetak teks keterangannya di bawah foto (jika ada)
+    if (imgObj.caption) {
+      // clear: both memastikan teks benar-benar jatuh ke bawah, tidak nyangkut di samping gambar
+      block += `<div class="article main-text" style="clear: both; padding-top: 5px;"><p>${imgObj.caption}</p></div>`;
+    }
+    
+    // 4. Tutup bungkus div
+    block += '</div>';
+    
     return block;
   }
 
