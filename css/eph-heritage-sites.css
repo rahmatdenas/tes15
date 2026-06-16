@@ -140,10 +140,10 @@ optgroup option {
   border-top-color: #eaa;
   margin-top: 0px;
 }
-}
 
 #details .wikipedia-link {
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 #details .wikipedia-link a {
