@@ -1,7 +1,7 @@
 'use strict';
 
 // 1. UBAH JUDUL PETA
-const BASE_TITLE = 'Peta Persebaran Masjid – Sumatera Barat';
+const BASE_TITLE = 'WikiSurau';
 
 // 2. ORGS: Kita akali menjadi singkatan nama daerah untuk label
 const ORGS = {
