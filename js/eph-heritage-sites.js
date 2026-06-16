@@ -58,20 +58,18 @@ function loadPrimaryData() {
     .then(() => {
       enableApp(); 
 
-      populateImageAndWikipediaData()
+  populateImageAndWikipediaData()
         .then(() => {
           updateFeatureCounts();      
-          applyIntersectionFilter(); 
-          
-          // KUNCI PERBAIKAN: Baca URL Link hanya setelah gambar & artikel siap!
+          // Panggil filter, tapi paksa peta agar diam di tempat (true)
+          applyIntersectionFilter(true); 
           processHashChange();
         })
         .catch(error => {
           console.warn("Gagal mengambil data Gambar/Wikipedia dari server, tetapi peta tetap bisa digunakan.", error);
           updateFeatureCounts();      
-          applyIntersectionFilter();
-          
-          // Tetap jalankan jika error agar link masih bisa terbuka
+          // Sama, paksa peta agar diam jika terjadi error (true)
+          applyIntersectionFilter(true);
           processHashChange();
         });
     })
