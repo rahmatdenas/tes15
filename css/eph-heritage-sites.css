@@ -171,7 +171,7 @@ optgroup option {
   -webkit-appearance: none; /* Mencegah Apple/Safari merusak desain Anda */
   appearance: none;         /* Mencegah browser lain merusak desain Anda */
   
-  border-bottom: 0px solid #eaa; /* Tambahan garis tepi agar kotak terlihat (opsional) */
+  border-bottom: 1px solid #eaa; /* Tambahan garis tepi agar kotak terlihat (opsional) */
   padding: 10px 20px;
   width: 100%;
   box-sizing: border-box;
