@@ -207,9 +207,24 @@ function displayPanelContent(id) {
 function displayRecordDetails(qid) {
   let record = Records[qid];
   window.location.hash = `#${qid}`;
-  document.title = `${record.indexTitle} – ${BASE_TITLE}`
+  document.title = `${record.indexTitle} – ${BASE_TITLE}`;
+  
   if (PrimaryDataIsLoaded) {
-    if (!record.panelElem) generateRecordDetails(qid);
+    // Jika panel belum pernah dibuat untuk bangunan ini
+    if (!record.panelElem) {
+      generateRecordDetails(qid); // Buat HTML beserta placeholder loading-nya
+      
+      // === KUNCI JAWABANNYA ADA DI SINI (PEMICU FASE 5) ===
+      // Kita paksa pancingan dilempar tepat setelah placeholder dibuat!
+      if (typeof populateImportantEventsData === 'function') {
+        populateImportantEventsData(qid);
+      }
+      if (typeof populateHistoricalImagesData === 'function') {
+        populateHistoricalImagesData(qid);
+      }
+      // ====================================================
+    }
+    
     let detailsElem = document.getElementById('details');
     detailsElem.replaceChild(record.panelElem, detailsElem.childNodes[0]);
     displayPanelContent('details');
