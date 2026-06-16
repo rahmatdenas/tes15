@@ -582,10 +582,10 @@ let infoTahunHtml = '';
       if (record.lat && record.lon) {
         // Jika ada koordinat, buat link ke Google Maps
         let mapsUrl = `https://www.google.com/maps?q=${record.lat},${record.lon}`;
-        infoKoordinatHtml = `<p>Koordinat: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${record.lat}, ${record.lon}</a></p>`;
+        infoKoordinatHtml = `<p class="koordinat-link">Koordinat: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${record.lat}, ${record.lon}</a></p>`;
       } else {
         // Jika tidak ada koordinat
-        infoKoordinatHtml = `<p>Koordinat: Data belum tersedia</p>`;
+        infoKoordinatHtml = `<p class="koordinat-link">Koordinat: Data belum tersedia</p>`;
       }
       // -----------------------------------
       
