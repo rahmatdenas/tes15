@@ -457,9 +457,9 @@ function updateFeatureCounts() {
   if (btnArt) btnArt.textContent = 'Ber-Artikel Wikipedia';
 
   // Update input placeholder (bukan textContent)
-  let searchInput = document.getElementById('search-input');
+let searchInput = document.getElementById('search-input');
   if (searchInput) {
-    searchInput.placeholder = `Hasil: ${total} (Ketik untuk mencari...)`;
+    searchInput.placeholder = `Menampilkan ${total} hasil (atau ketik di sini untuk mencari)`;
   }
 }
 
