@@ -568,6 +568,18 @@ let infoTahunHtml = '';
       // MENGGABUNGKAN TEKS LOKASI DAN TYPE NAME DI SINI
       let infoLokasiHtml = `<p>Terletak di: ${teksLokasi}, ${type.name}</p>`;
 
+// --- KODE BARU: Logika Koordinat ---
+      let infoKoordinatHtml = '';
+      if (record.lat && record.lon) {
+        // Jika ada koordinat, buat link ke Google Maps
+        let mapsUrl = `https://www.google.com/maps?q=${record.lat},${record.lon}`;
+        infoKoordinatHtml = `<p>Koordinat: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${record.lat}, ${record.lon}</a></p>`;
+      } else {
+        // Jika tidak ada koordinat
+        infoKoordinatHtml = `<p>Koordinat: Data belum tersedia</p>`;
+      }
+      // -----------------------------------
+      
       designationsHtml +=
         '<li>' +
           // Baris <h3> dihapus dari sini
@@ -576,6 +588,7 @@ let infoTahunHtml = '';
           '</div>' +
           infoLokasiHtml + 
           infoTahunHtml +
+        infoKoordinatHtml +
         '</li>';
         
     });
