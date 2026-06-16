@@ -675,7 +675,7 @@ function renderHistoricalImagesInPanel(qid) {
     
     // Cetak teks keterangannya di bawah foto (jika ada)
     if (imgObj.caption) {
-      block += `<div class="article main-text" style="clear: both; padding-top: 5px;"><p>${imgObj.caption}</p></div>`;
+      block += `<div class="article main-text" style="padding-top: 0px;"><p>${imgObj.caption}</p></div>`;
     }
     
     // Tutup bungkus div
