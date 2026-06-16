@@ -201,6 +201,28 @@ optgroup option {
   cursor: pointer;
 }
 
+/* 1. Matikan desain X bawaan browser */
+#search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* 2. Gambar ulang X kita sendiri menggunakan vektor SVG agar tajam */
+  height: 14px;
+  width: 14px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill='%23888888' d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3e%3c/svg%3e");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+/* 3. Paksa X untuk selalu tampil selama kotak tidak kosong (menggunakan trik placeholder-shown) */
+#search-input:not(:placeholder-shown)::-webkit-search-cancel-button {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 #details .wikipedia-link a img {
   display: inline-block;
   padding-right: 3px;
