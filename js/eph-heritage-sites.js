@@ -537,7 +537,7 @@ function activateSite(qid) {
 function generateRecordDetails(qid) {
   let record = Records[qid];
   let titleHtml = `<h1>${record.title}</h1>`;
-  let figureHtml = generateFigure(record.imageFilename, ['main-image']);
+  let figureHtml = generateFigure(record.imageFilename);
 
   let articleHtml;
   if (record.articleTitle) {
