@@ -215,9 +215,6 @@ function populateImportantEventsData(qid) {
 // ====================================================================
 // FUNGSI RENDER: Menyuntikkan Data Peristiwa (DIPERBAIKI)
 // ====================================================================
-// ====================================================================
-// FUNGSI RENDER: Menyuntikkan Data Peristiwa (DIPERBAIKI)
-// ====================================================================
 function renderEventsInPanel(qid) {
   let record = Records[qid];
   
@@ -238,21 +235,22 @@ function renderEventsInPanel(qid) {
       return orderA - orderB;
     });
 
-    // KUNCI PERUBAHAN 1 & 3: Tidak pakai <h2>, format diubah menjadi "Label: Waktu"
     let html = '';
     record.events.forEach(ev => {
-      // Membuat huruf pertama dari label menjadi kapital (cth: "pembebasan tanah" -> "Pembebasan tanah")
+      // Membuat huruf pertama kapital
       let capLabel = ev.label.charAt(0).toUpperCase() + ev.label.slice(1);
       let timeText = ev.time ? ev.time : ''; 
       
+      // Langsung dicetak dengan <p> saja tanpa div
       html += `<p>${capLabel}: ${timeText}</p>`;
     });
     
+    // Masukkan ke placeholder, hapus status loading, dan tampilkan
     container.innerHTML = html;
     container.classList.remove('loading');
     container.style.display = 'block';
   } else {
-    // KUNCI PERUBAHAN 2: Fungsi opsional tetap dipertahankan. Jika tidak ada, sembunyikan jejaknya.
+    // Jika data tidak ada, bersihkan kontainer dan sembunyikan sepenuhnya
     container.innerHTML = '';
     container.classList.remove('loading');
     container.style.display = 'none';
@@ -580,7 +578,7 @@ function generateRecordDetails(qid) {
   let designationsHtml = '<h2>Ringkasan</h2>';
   designationsHtml += '<ul class="designations">';
 
-  let isFirstDesignation = true; // Flag untuk memastikan container peristiwa tidak terduplikasi jika ada banyak tipe organisasi
+  let isFirstDesignation = true; // Mencegah duplikasi container peristiwa
 
   Object.keys(record.designations)
     .map(qid => [qid, DESIGNATION_TYPES[qid].order]) 
@@ -608,14 +606,17 @@ function generateRecordDetails(qid) {
         infoKoordinatHtml = `<p class="koordinat-link">Koordinat: Data belum tersedia</p>`;
       }
       
-      // --- KUNCI PERUBAHAN: Placeholder Peristiwa dipindah ke sini (Di bawah Koordinat) ---
+      // --- LOADER VISUAL KEMBALI DI SINI ---
       let eventsHtmlPlaceholder = '';
       if (isFirstDesignation) {
-        // Disuntikkan sebagai div kosong tanpa class loading agar rapi sebelum terisi
-        eventsHtmlPlaceholder = `<div id="events-container-${qid}"></div>`;
+        // Kontainer utama (wajib ada agar JS bisa menyuntikkan <p> ke mari) dilengkapi animasi loader mini
+        eventsHtmlPlaceholder = `
+          <div id="events-container-${qid}" class="loading" style="margin-top: 8px; min-height: 24px;">
+            <div class="loader" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div>
+          </div>`;
         isFirstDesignation = false;
       }
-      // ----------------------------------------------------------------------------------
+      // -------------------------------------
 
       designationsHtml +=
         '<li>' +
@@ -625,7 +626,7 @@ function generateRecordDetails(qid) {
           infoLokasiHtml + 
           infoTahunHtml +
           infoKoordinatHtml +
-          eventsHtmlPlaceholder + // <-- Disisipkan di titik ini
+          eventsHtmlPlaceholder + // Placeholder peristiwa & loader disisipkan di sini
         '</li>';
         
     });
@@ -636,7 +637,6 @@ function generateRecordDetails(qid) {
   // PLACEHOLDER ARSIP
   // ====================================================================
   let arsipHtml = `<div id="arsip-container-${qid}" class="loading"><div class="loader"></div></div>`;
-  // let eventsHtml telah dihilangkan dari sini karena sudah dipindah ke dalam designationsHtml
 
   let panelElem = document.createElement('div');
   
@@ -647,7 +647,7 @@ function generateRecordDetails(qid) {
     figureHtml + 
     articleHtml +
     designationsHtml + 
-    arsipHtml;  // <-- eventsHtml juga dihilangkan dari variabel penggabung ini
+    arsipHtml;
 
   record.panelElem = panelElem;
 
