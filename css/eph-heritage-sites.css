@@ -166,6 +166,17 @@ optgroup option {
   background: #eee;
 }
 
+/* 1. Mengubah warna teks SAAT DIKETIK menjadi putih */
+#search-input {
+  color: #eaa;
+}
+
+/* 2. Mengubah warna teks PLACEHOLDER menjadi putih */
+#search-input::placeholder {
+  color: #eaa;
+  opacity: 1; /* Sangat penting ditambahkan */
+}
+
 #details .wikipedia-link a img {
   display: inline-block;
   padding-right: 3px;
