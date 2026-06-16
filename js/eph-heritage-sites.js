@@ -334,6 +334,7 @@ function populateDesignationIndexNodes() {
 let currentRegionFilter = 'all';
 let activeFeatures = new Set(); 
 let currentSortMode = 'alphabetical'; // Mode urut bawaan
+let currentSearchQuery = '';
 
 function generateFilterSelect() {
   let selectRegion = document.getElementById('filter-region');
@@ -403,6 +404,15 @@ function generateFilterSelect() {
       applyIntersectionFilter();
     });
   });
+
+  let searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      // Simpan teks menjadi huruf kecil semua agar pencarian tidak sensitif huruf besar/kecil
+      currentSearchQuery = this.value.toLowerCase();
+      applyIntersectionFilter(); // Terapkan filter dan perbarui peta/daftar
+    });
+  }
 }
 
 // Menghitung dinamis (Menghapus countYear karena fiturnya sudah diganti menjadi fungsi urut)
@@ -410,44 +420,39 @@ function updateFeatureCounts() {
   let total = 0;
 
   Object.values(Records).forEach(record => {
-
     // cek filter wilayah
-    let matchRegion =
-      (currentRegionFilter === 'all' ||
-       record.areaTags.has(currentRegionFilter));
+    let matchRegion = (currentRegionFilter === 'all' || record.areaTags.has(currentRegionFilter));
 
     // cek filter fitur
     let matchFeature = true;
-
     if (activeFeatures.size > 0) {
-      if (activeFeatures.has('image') && !record.imageFilename) {
-        matchFeature = false;
-      }
+      if (activeFeatures.has('image') && !record.imageFilename) matchFeature = false;
+      if (activeFeatures.has('article') && record.articleTitle === undefined) matchFeature = false;
+    }
 
-      if (activeFeatures.has('article') && record.articleTitle === undefined) {
-        matchFeature = false;
-      }
+    // KODE BARU: Cek pencarian teks
+    let matchSearch = true;
+    if (currentSearchQuery.trim() !== '') {
+      // Mencari kecocokan pada judul situs bersejarah
+      matchSearch = record.indexTitle.toLowerCase().includes(currentSearchQuery);
     }
 
     // hitung hasil akhir
-    if (matchRegion && matchFeature) {
+    if (matchRegion && matchFeature && matchSearch) {
       total++;
     }
   });
 
-  // tombol tanpa angka
-  document.getElementById('btn-all').textContent =
-      'Semua';
+  // update tombol
+  document.getElementById('btn-all').textContent = 'Semua';
+  document.getElementById('btn-image').textContent = 'Ber-Gambar';
+  document.getElementById('btn-article').textContent = 'Ber-Artikel Wikipedia';
 
-  document.getElementById('btn-image').textContent =
-      'Ber-Gambar';
-
-  document.getElementById('btn-article').textContent =
-      'Ber-Artikel Wikipedia';
-
-  // update label Total
-  document.getElementById('total-label').textContent =
-      `Total: ${total}`;
+  // KODE BARU: Update input placeholder (bukan textContent)
+  let searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.placeholder = `Hasil: ${total} (Ketik untuk mencari...)`;
+  }
 }
 
 // Fungsi Eksekutor & Algoritma Pengurutan Baru
@@ -462,38 +467,38 @@ function applyIntersectionFilter() {
     let matchRegion = (currentRegionFilter === 'all' || record.areaTags.has(currentRegionFilter));
     let matchFeature = true;
     
-    // Cek tombol fitur (menghapus pengecekan 'year')
+    // Cek tombol fitur
     if (activeFeatures.size > 0) {
       if (activeFeatures.has('image') && !record.imageFilename) matchFeature = false;
       if (activeFeatures.has('article') && record.articleTitle === undefined) matchFeature = false;
     }
-    return matchRegion && matchFeature;
+
+    // KODE BARU: Cek pencarian teks
+    let matchSearch = true;
+    if (currentSearchQuery.trim() !== '') {
+      matchSearch = record.indexTitle.toLowerCase().includes(currentSearchQuery);
+    }
+
+    return matchRegion && matchFeature && matchSearch;
 
   }).sort((a, b) => {
-    
-    // LOGIKA PENGURUTAN BARU
+    // LOGIKA PENGURUTAN (TIDAK BERUBAH)
     if (currentSortMode === 'age') {
       let aHasYear = !!a.rawTahunBerdiri;
       let bHasYear = !!b.rawTahunBerdiri;
 
       if (aHasYear && bHasYear) {
-        // Jika keduanya punya tahun, urutkan dari yang usianya paling tua (angka tahun terkecil)
         return a.rawTahunBerdiri.localeCompare(b.rawTahunBerdiri);
       } else if (aHasYear && !bHasYear) {
-        // Jika A punya tahun dan B tidak, A ditaruh di atas
         return -1;
       } else if (!aHasYear && bHasYear) {
-        // Jika B punya tahun dan A tidak, B ditaruh di atas
         return 1;
       } else {
-        // Jika keduanya tidak punya tahun, urutkan berdasarkan abjad sebagai penentu terakhir
         return a.indexTitle.localeCompare(b.indexTitle);
       }
     } else {
-      // Mode default: Urut murni berdasarkan Abjad (A-Z)
       return a.indexTitle.localeCompare(b.indexTitle);
     }
-    
   });
 
   validRecords.forEach(record => {
@@ -505,7 +510,9 @@ function applyIntersectionFilter() {
     Cluster.addLayers(validMarkers);
     Map.fitBounds(Cluster.getBounds());
   }
-updateFeatureCounts();
+  
+  // Hitung ulang placeholder sesuai jumlah yang terfilter saat ini
+  updateFeatureCounts();
 }
 
 
