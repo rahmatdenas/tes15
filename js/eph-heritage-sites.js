@@ -584,7 +584,7 @@ function generateRecordDetails(qid) {
     .map(item => item[0])
     .forEach(designationQid => {
 
- let type = DESIGNATION_TYPES[designationQid];
+let type = DESIGNATION_TYPES[designationQid];
 
       let infoTahunHtml = '';
       if (record.tahunBerdiri) {
@@ -593,17 +593,24 @@ function generateRecordDetails(qid) {
         infoTahunHtml = `<p>Didirikan: Data belum tersedia</p>`;
       }
 
-let teksLokasi = record.lokasiSpesifik || ORGS[type.org];
+      // --- LOGIKA LOKASI ANTI-DOBEL ---
+      let induk = type.name; 
+      let spesifik = record.lokasiSpesifik; 
+      let namaLokasi = induk; // Default: "Kota Padang"
+
+      // Jika data kecamatan/nagari ada, DAN tidak dobel/identik dengan nama kabupaten/kota (abaikan huruf besar/kecil)
+      if (spesifik && spesifik.toLowerCase() !== induk.toLowerCase()) {
+        namaLokasi = `${spesifik}, ${induk}`; // Contoh hasil: "Kecamatan Banuhampu, Kabupaten Agam"
+      }
+
       let infoLokasiHtml = '';
 
-      // --- ANTISIPASI KOORDINAT KOSONG DENGAN CLASS CSS ---
       if (record.lat && record.lon) {
-        // JIKA ADA KOORDINAT: Tambahkan class="koordinat-link" di dalam tag <p>
-        let mapsUrl = `https://www.google.com/maps?q=$${record.lat},${record.lon}`;
-        infoLokasiHtml = `<p class="koordinat-link">Terletak di: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Buka di Google Maps" style="text-decoration: underline; color: inherit;">${teksLokasi}, ${type.name}</a></p>`;
+        // Tautan Google Maps baku
+        let mapsUrl = `https://www.google.com/maps?q=${record.lat},${record.lon}`;
+        infoLokasiHtml = `<p class="koordinat-link">Terletak di: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Buka di Google Maps" style="text-decoration: underline; color: inherit;">${namaLokasi}</a></p>`;
       } else {
-        // JIKA KOORDINAT KOSONG: Tetap pasang class="koordinat-link" agar gayanya seragam
-        infoLokasiHtml = `<p class="koordinat-link">Terletak di: ${teksLokasi}, ${type.name}</p>`;
+        infoLokasiHtml = `<p class="koordinat-link">Terletak di: ${namaLokasi}</p>`;
       }
       
       // --- LOADER VISUAL KEMBALI DI SINI ---
