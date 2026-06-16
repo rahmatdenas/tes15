@@ -236,7 +236,7 @@ function renderEventsInPanel(qid) {
       return orderA - orderB;
     });
 
-    let html = '<h2>Peristiwa Penting</h2><ul class="designations" style="margin-left:-65px"><li>';
+    let html = '<h2>Peristiwa Penting</h2><ul class="designations"><li>';
     record.events.forEach(ev => {
       let timeText = ev.time ? ` (${ev.time})` : ''; 
       html += `<p><strong>${ev.label}</strong>${timeText}</p>`;
