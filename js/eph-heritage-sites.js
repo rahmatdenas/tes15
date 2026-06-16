@@ -545,7 +545,7 @@ let figureHtml = generateFigure(record.imageFilename).replace('<figure', '<figur
   else {
     articleHtml = '<div class="article main-text nodata"><p>Situs ini belum memiliki artikel Wikipedia berbahasa Indonesia.</p></div>';
   }
-let designationsHtml = '<h2>Informasi</h2>';
+let designationsHtml = '<h2>Ringkasan</h2>';
   designationsHtml += '<ul class="designations">';
 
   Object.keys(record.designations)
@@ -556,7 +556,7 @@ let designationsHtml = '<h2>Informasi</h2>';
 
       let type = DESIGNATION_TYPES[designationQid];
 
-      let infoTahunHtml = '';
+let infoTahunHtml = '';
       if (record.tahunBerdiri) {
         infoTahunHtml = `<p>Didirikan: ${record.tahunBerdiri}</p>`;
       } else {
@@ -564,11 +564,13 @@ let designationsHtml = '<h2>Informasi</h2>';
       }
 
       let teksLokasi = record.lokasiSpesifik || ORGS[type.org];
-      let infoLokasiHtml = `<p>Terletak di: ${teksLokasi}</p>`;
+      
+      // MENGGABUNGKAN TEKS LOKASI DAN TYPE NAME DI SINI
+      let infoLokasiHtml = `<p>Terletak di: ${teksLokasi}, ${type.name}</p>`;
 
       designationsHtml +=
         '<li>' +
-          `<h3>${type.name}</h3>` +
+          // Baris <h3> dihapus dari sini
           '<div class="org">' +
             `<img src="img/org_logo_${type.org.toLowerCase()}.svg">` + 
           '</div>' +
