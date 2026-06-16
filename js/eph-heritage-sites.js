@@ -215,10 +215,12 @@ function populateImportantEventsData(qid) {
 // ====================================================================
 // FUNGSI RENDER: Menyuntikkan Data Peristiwa (DIPERBAIKI)
 // ====================================================================
+// ====================================================================
+// FUNGSI RENDER: Menyuntikkan Data Peristiwa (DIPERBAIKI)
+// ====================================================================
 function renderEventsInPanel(qid) {
   let record = Records[qid];
   
-  // KUNCI PERBAIKAN: Cari elemen di dalam memori panelElem, bukan di seluruh dokumen
   if (!record.panelElem) return;
   let container = record.panelElem.querySelector(`#events-container-${qid}`);
   if (!container) return; 
@@ -236,17 +238,21 @@ function renderEventsInPanel(qid) {
       return orderA - orderB;
     });
 
-    let html = '<h2>Peristiwa Penting</h2><ul class="designations"><li>';
+    // KUNCI PERUBAHAN 1 & 3: Tidak pakai <h2>, format diubah menjadi "Label: Waktu"
+    let html = '';
     record.events.forEach(ev => {
-      let timeText = ev.time ? ` (${ev.time})` : ''; 
-      html += `<p><strong>${ev.label}</strong>${timeText}</p>`;
+      // Membuat huruf pertama dari label menjadi kapital (cth: "pembebasan tanah" -> "Pembebasan tanah")
+      let capLabel = ev.label.charAt(0).toUpperCase() + ev.label.slice(1);
+      let timeText = ev.time ? ev.time : ''; 
+      
+      html += `<p>${capLabel}: ${timeText}</p>`;
     });
-    html += '</li></ul>';
     
     container.innerHTML = html;
     container.classList.remove('loading');
+    container.style.display = 'block';
   } else {
-    // Jika tidak ada data, bersihkan loading dan hilangkan jejaknya
+    // KUNCI PERUBAHAN 2: Fungsi opsional tetap dipertahankan. Jika tidak ada, sembunyikan jejaknya.
     container.innerHTML = '';
     container.classList.remove('loading');
     container.style.display = 'none';
@@ -557,10 +563,8 @@ function generateRecordDetails(qid) {
   let record = Records[qid];
   let titleHtml = `<h1>${record.title}</h1>`;
 
-  // 1. Panggil fungsi aslinya dulu TANPA di-replace langsung
   let figureHtml = generateFigure(record.imageFilename);
 
-  // 2. Tambahkan logika: Jika gambar ada, sisipkan 'gambar-utama' di DALAM class yang sudah ada
   if (record.imageFilename) {
     figureHtml = figureHtml.replace('<figure class="', '<figure class="gambar-utama ');
   }
@@ -576,6 +580,8 @@ function generateRecordDetails(qid) {
   let designationsHtml = '<h2>Ringkasan</h2>';
   designationsHtml += '<ul class="designations">';
 
+  let isFirstDesignation = true; // Flag untuk memastikan container peristiwa tidak terduplikasi jika ada banyak tipe organisasi
+
   Object.keys(record.designations)
     .map(qid => [qid, DESIGNATION_TYPES[qid].order]) 
     .sort((a, b) => a[1] - b[1])
@@ -584,7 +590,7 @@ function generateRecordDetails(qid) {
 
       let type = DESIGNATION_TYPES[designationQid];
 
-let infoTahunHtml = '';
+      let infoTahunHtml = '';
       if (record.tahunBerdiri) {
         infoTahunHtml = `<p>Didirikan: ${record.tahunBerdiri}</p>`;
       } else {
@@ -592,43 +598,46 @@ let infoTahunHtml = '';
       }
 
       let teksLokasi = record.lokasiSpesifik || ORGS[type.org];
-      
-      // MENGGABUNGKAN TEKS LOKASI DAN TYPE NAME DI SINI
       let infoLokasiHtml = `<p>Terletak di: ${teksLokasi}, ${type.name}</p>`;
 
-// --- KODE BARU: Logika Koordinat ---
       let infoKoordinatHtml = '';
       if (record.lat && record.lon) {
-        // Jika ada koordinat, buat link ke Google Maps
         let mapsUrl = `https://www.google.com/maps?q=${record.lat},${record.lon}`;
         infoKoordinatHtml = `<p class="koordinat-link">Koordinat: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${record.lat}, ${record.lon}</a></p>`;
       } else {
-        // Jika tidak ada koordinat
         infoKoordinatHtml = `<p class="koordinat-link">Koordinat: Data belum tersedia</p>`;
       }
-      // -----------------------------------
       
+      // --- KUNCI PERUBAHAN: Placeholder Peristiwa dipindah ke sini (Di bawah Koordinat) ---
+      let eventsHtmlPlaceholder = '';
+      if (isFirstDesignation) {
+        // Disuntikkan sebagai div kosong tanpa class loading agar rapi sebelum terisi
+        eventsHtmlPlaceholder = `<div id="events-container-${qid}"></div>`;
+        isFirstDesignation = false;
+      }
+      // ----------------------------------------------------------------------------------
+
       designationsHtml +=
         '<li>' +
-          // Baris <h3> dihapus dari sini
           '<div class="org">' +
             `<img src="img/org_logo_${type.org.toLowerCase()}.svg">` + 
           '</div>' +
           infoLokasiHtml + 
           infoTahunHtml +
-        infoKoordinatHtml +
+          infoKoordinatHtml +
+          eventsHtmlPlaceholder + // <-- Disisipkan di titik ini
         '</li>';
         
     });
     
   designationsHtml += '</ul>';
-// ====================================================================
-  // PLACEHOLDER ARSIP & PERISTIWA PENTING
+
+  // ====================================================================
+  // PLACEHOLDER ARSIP
   // ====================================================================
   let arsipHtml = `<div id="arsip-container-${qid}" class="loading"><div class="loader"></div></div>`;
-  let eventsHtml = `<div id="events-container-${qid}" class="loading"><div class="loader"></div></div>`;
+  // let eventsHtml telah dihilangkan dari sini karena sudah dipindah ke dalam designationsHtml
 
-  // --- BAGIAN INI TETAP ADA, HANYA DITAMBAH isinya ---
   let panelElem = document.createElement('div');
   
   panelElem.innerHTML =
@@ -638,8 +647,7 @@ let infoTahunHtml = '';
     figureHtml + 
     articleHtml +
     designationsHtml + 
-    arsipHtml +  // <-- Ini tambahan barunya
-    eventsHtml;  // <-- Ini tambahan barunya
+    arsipHtml;  // <-- eventsHtml juga dihilangkan dari variabel penggabung ini
 
   record.panelElem = panelElem;
 
