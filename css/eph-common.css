@@ -193,7 +193,7 @@ nav li a.active {
 #details figure {
   float: right;
   clear: right;
-  margin: 0 0 20px 0;
+  margin: 0 0 20px 10px;
   padding: 0;
   width: 156px;
   font-size: 13px;
