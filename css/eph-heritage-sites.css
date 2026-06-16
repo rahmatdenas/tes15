@@ -168,7 +168,13 @@ optgroup option {
 
 /* 1. Mengubah warna teks SAAT DIKETIK menjadi putih */
 #search-input {
-  color: #eaa;
+border: 0px solid #FFF;
+  padding: 6px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  background: #822;      /* Warna latar belakang merah gelap */
+  color: #eaa;        /* Warna teks saat Anda mengetik */
 }
 
 /* 2. Mengubah warna teks PLACEHOLDER menjadi putih */
