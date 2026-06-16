@@ -105,10 +105,6 @@
     font-size: 20px;
   }
 
-  nav ul {
-    margin: 0 16px;
-  }
-
   /* ---------- Area filter ---------- */
 
   .filter-box select {
@@ -128,7 +124,6 @@
 
   /* ---------- Daftar indeks: target sentuh lebih besar ---------- */
   #index-list li a {
-    margin: 0 16px;
     padding: 10px 0;
     font-size: 13.5px;
     line-height: 20px;
