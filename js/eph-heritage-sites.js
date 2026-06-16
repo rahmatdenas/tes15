@@ -62,14 +62,12 @@ function loadPrimaryData() {
         .then(() => {
           updateFeatureCounts();      
           // Panggil filter, tapi paksa peta agar diam di tempat (true)
-          applyIntersectionFilter(true); 
           processHashChange();
         })
         .catch(error => {
           console.warn("Gagal mengambil data Gambar/Wikipedia dari server, tetapi peta tetap bisa digunakan.", error);
           updateFeatureCounts();      
           // Sama, paksa peta agar diam jika terjadi error (true)
-          applyIntersectionFilter(true);
           processHashChange();
         });
     })
