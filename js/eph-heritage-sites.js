@@ -584,7 +584,7 @@ function generateRecordDetails(qid) {
     .map(item => item[0])
     .forEach(designationQid => {
 
-      let type = DESIGNATION_TYPES[designationQid];
+ let type = DESIGNATION_TYPES[designationQid];
 
       let infoTahunHtml = '';
       if (record.tahunBerdiri) {
@@ -594,14 +594,16 @@ function generateRecordDetails(qid) {
       }
 
       let teksLokasi = record.lokasiSpesifik || ORGS[type.org];
-      let infoLokasiHtml = `<p>Terletak di: ${teksLokasi}, ${type.name}</p>`;
+      let infoLokasiHtml = '';
 
-      let infoKoordinatHtml = '';
+      // --- ANTISIPASI KOORDINAT KOSONG ---
       if (record.lat && record.lon) {
+        // JIKA ADA KOORDINAT: Buat link Google Maps resmi dan bungkus teksnya dengan tag <a>
         let mapsUrl = `https://www.google.com/maps?q=${record.lat},${record.lon}`;
-        infoKoordinatHtml = `<p class="koordinat-link">Koordinat: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">${record.lat}, ${record.lon}</a></p>`;
+        infoLokasiHtml = `<p>Terletak di: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Buka di Google Maps" style="text-decoration: underline; color: inherit;">${teksLokasi}, ${type.name}</a></p>`;
       } else {
-        infoKoordinatHtml = `<p class="koordinat-link">Koordinat: Data belum tersedia</p>`;
+        // JIKA KOORDINAT KOSONG: Cetak sebagai teks biasa tanpa tag <a>
+        infoLokasiHtml = `<p>Terletak di: ${teksLokasi}, ${type.name}</p>`;
       }
       
       // --- LOADER VISUAL KEMBALI DI SINI ---
@@ -623,7 +625,6 @@ function generateRecordDetails(qid) {
           '</div>' +
           infoLokasiHtml + 
           infoTahunHtml +
-          infoKoordinatHtml +
           eventsHtmlPlaceholder + // Placeholder peristiwa & loader disisipkan di sini
         '</li>';
         
