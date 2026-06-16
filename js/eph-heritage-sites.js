@@ -47,38 +47,28 @@ function formatWikidataDate(dateString, precision) {
 }
 
 // ============================================================
-// FUNGSI UTAMA
+// FUNGSI UTAMA (DIOPTIMALKAN)
 // ============================================================
 function loadPrimaryData() {
-
   doPreProcessing();
 
   populateDesignationTypesData()
-
     .then(() => {
-
-      // Menjalankan pencarian BERSAMAAN (Paralel)
-
-      return Promise.all([
-
-        populateCoordinatesData().then(populateMapAndIndex), // Jalur 1: Koordinat
-
-        populateImageAndWikipediaData(),                     // Jalur 2: Gambar & Artikel
-
-      ]);
-
+      // OPTIMASI: Hanya tunggu Jalur Koordinat selesai agar peta cepat terbuka!
+      // Kita menghapus Promise.all di sini.
+      return populateCoordinatesData().then(populateMapAndIndex);
     })
-
     .then(() => {
+      // 1. Langsung aktifkan aplikasi (buka kunci layar loading)
+      enableApp(); 
 
-      // KODE BARU: Paksa hitung ulang setelah SEMUA jalur data selesai
-
-      updateFeatureCounts(); 
-
-      enableApp();
-
+      // 2. Jalankan Jalur Gambar & Artikel di latar belakang tanpa memblokir pengguna
+      populateImageAndWikipediaData().then(() => {
+        // Setelah data gambar/artikel selesai diunduh, hitung ulang filter dan perbarui tampilan
+        updateFeatureCounts();      
+        applyIntersectionFilter(); 
+      });
     });
-
 }
 function doPreProcessing() {
   let anchorElem = document.getElementById('wdqs-link');
@@ -237,23 +227,22 @@ function renderEventsInPanel(qid) {
 
     let html = '';
     record.events.forEach(ev => {
-      // Membuat huruf pertama kapital
       let capLabel = ev.label.charAt(0).toUpperCase() + ev.label.slice(1);
       let timeText = ev.time ? ev.time : ''; 
       
-      // Langsung dicetak dengan <p> saja tanpa div
       html += `<p>${capLabel}: ${timeText}</p>`;
     });
     
-    // Masukkan ke placeholder, hapus status loading, dan tampilkan
-    container.innerHTML = html;
-    container.classList.remove('loading');
-    container.style.display = 'block';
+    // KUNCI PERBAIKAN:
+    // 1. Suntikkan kumpulan <p> tepat di SEBELUM div container (sehingga sejajar dengan <p> lainnya)
+    container.insertAdjacentHTML('beforebegin', html);
+    
+    // 2. Hancurkan div container beserta animasi loadernya karena sudah tidak dibutuhkan
+    container.remove();
+
   } else {
-    // Jika data tidak ada, bersihkan kontainer dan sembunyikan sepenuhnya
-    container.innerHTML = '';
-    container.classList.remove('loading');
-    container.style.display = 'none';
+    // Jika data tidak ada, langsung hancurkan saja containernya agar tidak meninggalkan ruang kosong
+    container.remove();
   }
 }
 
