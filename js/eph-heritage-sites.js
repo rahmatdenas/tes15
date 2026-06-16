@@ -645,13 +645,6 @@ function populateHistoricalImagesData(qid) {
   );
 }
 
-Keputusan yang sangat bijak! Meninggalkan tag <h2> yang kosong adalah praktik penulisan kode yang jauh lebih sehat dan profesional.
-
-Menjawab pertanyaanmu: Cara yang paling baik dan bersih adalah dengan menempelkan langsung gaya garis tersebut sebagai batas atas (border-top) pada div pembungkusnya. Dengan cara ini, kita tidak perlu menambah elemen HTML baru sama sekali, tapi efek visualnya tetap sama persis.
-
-Berikut adalah kode final untuk fungsi render-mu. Saya sudah menyuntikkan border-top: 1px solid #eaa; ke dalam pembungkusnya dan menghapus judul <h2> di bagian bawah sesuai permintaanmu:
-
-JavaScript
 // ====================================================================
 // FUNGSI RENDER: Menyuntikkan Arsip Foto & Keterangan
 // ====================================================================
