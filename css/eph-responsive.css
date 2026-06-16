@@ -161,7 +161,7 @@
 }
 
 #details .main-text {
-  padding: 0 0px 0 0;
+  padding: 0px !important;
 }
    
   #details figure.nodata {
