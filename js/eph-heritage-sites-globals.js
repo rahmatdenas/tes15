@@ -51,22 +51,20 @@ const DESIGNATION_TYPES = {
   Q7266: { org: 'KSL', name: 'Kota Solok', order: 19 },
 };
 
-// 4. SPARQL_QUERY_0: Mengambil data masjid, filter wilayah, properti P131 & P571 (dengan presisi)
+// 4. SPARQL_QUERY_0: Versi Optimasi Ekstrem (Tanpa FILTER LANG & ORDER BY)
 const SPARQL_QUERY_0 =
-`SELECT ?siteQid ?siteLabel ?designationQid ?p131Label ?tahunBerdiriMentah ?tahunPresisi WHERE {
-  VALUES ?designation { wd:Q6019 wd:Q6024 wd:Q6038 wd:Q6032 wd:Q6042 wd:Q6048 wd:Q6103 wd:Q6065 wd:Q6055 wd:Q6058 wd:Q6083 wd:Q6093 wd:Q7248 wd:Q7253 wd:Q7256 wd:Q7258 wd:Q7261 wd:Q7263 wd:Q7266 }    
+`SELECT ?siteQid ?siteLabel ?designationQid (?p131LokasiLabel AS ?p131Label) ?tahunBerdiriMentah ?tahunPresisi WHERE {
+  # 1. Daftarkan target Kabupaten/Kota
+  VALUES ?designation { wd:Q6019 wd:Q6024 wd:Q6038 wd:Q6032 wd:Q6042 wd:Q6048 wd:Q6103 wd:Q6065 wd:Q6055 wd:Q6058 wd:Q6083 wd:Q6093 wd:Q7248 wd:Q7253 wd:Q7256 wd:Q7258 wd:Q7261 wd:Q7263 wd:Q7266 }  
   
-  ?site wdt:P31 wd:Q32815 . 
-  ?site wdt:P131+ ?designation .
+  # 2. Ambil entitas Masjid yang berada dalam cakupan wilayah di atas
+  ?site wdt:P31 wd:Q32815 ;
+        wdt:P131+ ?designation .
   
-  ?site rdfs:label ?siteLabel . FILTER(LANG(?siteLabel) = "id") .
-  
-  OPTIONAL {
-    ?site wdt:P131 ?p131Lokasi .
-    ?p131Lokasi rdfs:label ?p131Label .
-    FILTER(LANG(?p131Label) = "id") .
-  }
+  # 3. Ambil lokasi persis (Kecamatan/Nagari) secara opsional
+  OPTIONAL { ?site wdt:P131 ?p131Lokasi . }
       
+  # 4. Ambil data tahun
   OPTIONAL { 
     ?site p:P571 ?inceptionStmt .
     ?inceptionStmt psv:P571 ?inceptionNode .
@@ -74,9 +72,13 @@ const SPARQL_QUERY_0 =
                    wikibase:timePrecision ?tahunPresisi .
   }
   
+  # 5. Potong URL menjadi ID murni
   BIND (SUBSTR(STR(?site), 32) AS ?siteQid) .
   BIND (SUBSTR(STR(?designation), 32) AS ?designationQid) .
-} ORDER BY ?siteLabel`;
+
+  # 6. Gunakan layanan otomatis Wikidata untuk menerjemahkan ke bahasa Indonesia
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "id,en,min". }
+}`;
 
 // 5. SPARQL_QUERY_1: Hanya mengambil koordinat P625
 const SPARQL_QUERY_1 =
