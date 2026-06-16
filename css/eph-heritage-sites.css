@@ -165,19 +165,29 @@ optgroup option {
 #details .koordinat-link a:hover {
   background: #eee;
 }
-
 /* Gaya Utama Kotak Pencarian */
 #search-input {
-  -webkit-appearance: none; /* Mencegah Apple/Safari merusak desain Anda */
-  appearance: none;         /* Mencegah browser lain merusak desain Anda */
+  -webkit-appearance: none; 
+  appearance: none;         
   
-  border-bottom: 1px solid #eaa; /* Tambahan garis tepi agar kotak terlihat (opsional) */
+  /* --- KODE BARU MULAI DI SINI --- */
+  border: none;             /* Menghapus kotak tepi bawaan browser seluruhnya */
+  outline: none;            /* Menghilangkan kotak tebal (hitam/biru) saat diklik */
+  border-radius: 0;         /* Mencegah Apple membuat sudut melengkung secara paksa */
+  border-bottom: 1px solid #eaa; /* Baru terapkan garis bawah yang Anda inginkan */
+  /* --- KODE BARU SELESAI --- */
+
   padding: 10px 20px;
   width: 100%;
   box-sizing: border-box;
   display: block;
   background: #f3e9e9;   
   color: #000000;        
+}
+
+/* Opsional: Efek saat kotak sedang diklik (fokus) agar garis bawah lebih tegas */
+#search-input:focus {
+  border-bottom: 2px solid #822; /* Garis bawah berubah warna/menebal saat diketik */
 }
 
 /* Gaya Khusus Teks Placeholder */
