@@ -544,12 +544,6 @@ function generateRecordDetails(qid) {
     articleHtml = '<div class="article main-text nodata"><p>Situs ini belum memiliki artikel Wikipedia berbahasa Indonesia.</p></div>';
   }
 
-  let designationsHtml = '<h2>Informasi</h2>';
-
-  if (record.pastImage) {
-    designationsHtml += generateFigure(record.pastImage);
-  }
-
   designationsHtml += '<ul class="designations">';
 
   Object.keys(record.designations)
