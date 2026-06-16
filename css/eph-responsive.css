@@ -149,22 +149,30 @@
     padding: 0;
   }
 
-#details > figure {
+#details figure {
   float: none;
   width: 100%;
   margin: 0 0 16px 0;
 }
+  #details figure img {
+    width: 100%;
+    height: auto;
+     box-sizing: border-box;
+  }
+
    [id^="arsip-container-"] figure {
   float: left; /* Atau nilai lain yang kamu mau */
   width: auto; 
   margin: 0;
 }
 
-  #details figure img {
-    width: 100%;
+  [id^="arsip-container-"] figure img {
+    width: auto;
     height: auto;
      box-sizing: border-box;
   }
+
+   
 
   #details figure.nodata {
     height: 70px;
