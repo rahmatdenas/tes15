@@ -645,6 +645,13 @@ function populateHistoricalImagesData(qid) {
   );
 }
 
+Keputusan yang sangat bijak! Meninggalkan tag <h2> yang kosong adalah praktik penulisan kode yang jauh lebih sehat dan profesional.
+
+Menjawab pertanyaanmu: Cara yang paling baik dan bersih adalah dengan menempelkan langsung gaya garis tersebut sebagai batas atas (border-top) pada div pembungkusnya. Dengan cara ini, kita tidak perlu menambah elemen HTML baru sama sekali, tapi efek visualnya tetap sama persis.
+
+Berikut adalah kode final untuk fungsi render-mu. Saya sudah menyuntikkan border-top: 1px solid #eaa; ke dalam pembungkusnya dan menghapus judul <h2> di bagian bawah sesuai permintaanmu:
+
+JavaScript
 // ====================================================================
 // FUNGSI RENDER: Menyuntikkan Arsip Foto & Keterangan
 // ====================================================================
@@ -657,21 +664,21 @@ function renderHistoricalImagesInPanel(qid) {
 
   let html = '';
   
-// Mesin pembuat blok HTML: Dibungkus div -> [Foto] -> [Keterangan]
+  // Mesin pembuat blok HTML
   function buildImageBlock(imgObj) {
-    // 1. Buka bungkus div (overflow: hidden membantu membersihkan efek 'float' dari CSS bawaan)
-    let block = '<div class="arsip-block" style="margin-bottom: 20px; overflow: hidden;">';
+    // KUNCI PERUBAHAN: Memasang border-top langsung di div pembungkus.
+    // padding-top: 20px diberikan agar ada jarak nafas antara garis dan foto.
+    let block = '<div class="arsip-block" style="border-top: 1px solid #eaa; padding-top: 20px; margin-bottom: 30px; overflow: hidden;">';
     
-    // 2. Cetak fotonya terlebih dahulu
+    // Cetak fotonya terlebih dahulu
     block += generateFigure(imgObj.file);
     
-    // 3. Cetak teks keterangannya di bawah foto (jika ada)
+    // Cetak teks keterangannya di bawah foto (jika ada)
     if (imgObj.caption) {
-      // clear: both memastikan teks benar-benar jatuh ke bawah, tidak nyangkut di samping gambar
-      block += `<div class="article main-text"><p>${imgObj.caption}</p></div>`;
+      block += `<div class="article main-text" style="clear: both; padding-top: 5px;"><p>${imgObj.caption}</p></div>`;
     }
     
-    // 4. Tutup bungkus div
+    // Tutup bungkus div
     block += '</div>';
     
     return block;
@@ -691,7 +698,8 @@ function renderHistoricalImagesInPanel(qid) {
 
   // Finalisasi penempelan ke layar
   if (html !== '') {
-    container.innerHTML = '<h2>Arsip & Foto Lingkungan</h2>' + html;
+    // KUNCI PERUBAHAN: H2 "Arsip & Foto Lingkungan" sudah dihapus
+    container.innerHTML = html;
     container.classList.remove('loading');
   } else {
     container.innerHTML = '';
@@ -699,7 +707,6 @@ function renderHistoricalImagesInPanel(qid) {
     container.style.display = 'none';
   }
 }
-
 function displayArticleExtract(title, elem) {
   loadJsonp(
     'https://id.wikipedia.org/w/api.php',
