@@ -608,7 +608,7 @@ let type = DESIGNATION_TYPES[designationQid];
       if (record.lat && record.lon) {
         // Tautan Google Maps baku
         let mapsUrl = `https://www.google.com/maps?q=${record.lat},${record.lon}`;
-        infoLokasiHtml = `<p class="koordinat-link">Terletak di: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Buka di Google Maps" style="text-decoration: underline; color: inherit;">${namaLokasi}</a></p>`;
+        infoLokasiHtml = `<p class="koordinat-link">Terletak di: <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Buka di Google Maps">${namaLokasi}</a></p>`;
       } else {
         infoLokasiHtml = `<p class="koordinat-link">Terletak di: ${namaLokasi}</p>`;
       }
