@@ -537,7 +537,15 @@ function activateSite(qid) {
 function generateRecordDetails(qid) {
   let record = Records[qid];
   let titleHtml = `<h1>${record.title}</h1>`;
-let figureHtml = generateFigure(record.imageFilename).replace('<figure', '<figure class="gambar-utama"');
+
+  // 1. Panggil fungsi aslinya dulu TANPA di-replace langsung
+  let figureHtml = generateFigure(record.imageFilename);
+
+  // 2. Tambahkan logika: Jika gambar ada, sisipkan 'gambar-utama' di DALAM class yang sudah ada
+  if (record.imageFilename) {
+    figureHtml = figureHtml.replace('<figure class="', '<figure class="gambar-utama ');
+  }
+
   let articleHtml;
   if (record.articleTitle) {
     articleHtml = '<div class="article main-text loading"><div class="loader"></div></div>';
@@ -545,7 +553,8 @@ let figureHtml = generateFigure(record.imageFilename).replace('<figure', '<figur
   else {
     articleHtml = '<div class="article main-text nodata"><p>Situs ini belum memiliki artikel Wikipedia berbahasa Indonesia.</p></div>';
   }
-let designationsHtml = '<h2>Ringkasan</h2>';
+  
+  let designationsHtml = '<h2>Ringkasan</h2>';
   designationsHtml += '<ul class="designations">';
 
   Object.keys(record.designations)
