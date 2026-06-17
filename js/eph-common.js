@@ -117,6 +117,7 @@ function queryWdqsThenProcess(query, processEachResult, postprocessCallback) {
     xhr.open('POST', WDQS_API_URL, true);
     xhr.overrideMimeType('text/plain');
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Api-User-Agent', 'WikiSurau/1.0 (mailto:rahmatdenas@gmail.com)');
     if (SparqlValuesClause) query = query.replace('<SPARQLVALUESCLAUSE>', SparqlValuesClause);
     xhr.send('format=json&query=' + encodeURIComponent(query));
   });
